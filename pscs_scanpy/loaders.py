@@ -4,7 +4,29 @@ import os
 from pscs_api import InputNode
 
 
-# This file contains abstract classes for nodes.
+class AnnDataLoadingNode(InputNode):
+    important_parameters = []
+
+    def __init__(self,
+                 path: str = None):
+        """
+        Loads an AnnData file (.h5ad) into memory.
+        Parameters
+        ----------
+        path : str
+            Path to the file to load.
+        """
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        # Load h5ad
+        data = anndata.read_h5ad(self.parameters["path"])
+        self._terminate(result=data)
+        return
+
+
 class CSVLoadingNode(InputNode):
     def __init__(self,
                  path: str = None,
