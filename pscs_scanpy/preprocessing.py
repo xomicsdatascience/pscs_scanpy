@@ -136,7 +136,7 @@ class PCA(PipelineNode):
     def __init__(self,
                  n_comps: Optional[int] = None,
                  zero_center: Optional[bool] = True,
-                 svd_solver: str = "arpack",
+                 svd_solver: Literal["arpack", "randomized", "auto", "lobpcg"] = "arpack",
                  random_state: Union[None, int] = 0,
                  use_highly_variable: Optional[bool] = None,
                  dtype: str = 'float32',

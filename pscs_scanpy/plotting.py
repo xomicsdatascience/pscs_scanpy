@@ -667,6 +667,387 @@ class DiffMap(OutputNode):
         ann_data = self._previous[0].result
         sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
         self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.diffmap(ann_data)
+        pl.diffmap(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class DrawGraph(OutputNode):
+    important_parameters = ["color", "save"]
+
+    def __init__(self,
+                 color: Union[str, Sequence[str], None] = None,
+                 gene_symbols: Optional[str] = None,
+                 use_raw: Optional[bool] = None,
+                 layer: Optional[str] = None,
+                 layout: Optional[Literal["fa", "fr", "rt", "rt_circular", "drl", "eq_tree", Ellipsis]] = None,
+                 edges: bool = False,
+                 edges_width: float = 0.1,
+                 edges_color: Union[str, Sequence[float], Sequence[str]] = "grey",
+                 neighbors_key: Optional[str] = None,
+                 arrows: bool = False,
+                 sort_order: bool = True,
+                 groups: Union[str, Collection[str], None] = None,
+                 dimensions: Union[Tuple[int, int], Collection[Tuple[int, int]], None] = None,
+                 components: Union[str, Collection[str], None] = None,
+                 projection: Literal["2d", "3d"] = "2d",
+                 legend_loc: str = "right margin",
+                 legend_fontsize: Union[int, float, Literal[
+                     "xx-small", "x-small", "small", "medium", "large", "x-large", "xx-large"], None] = None,
+                 legend_fontweight: Union[
+                     int, Literal["light", "normal", "medium", "semibold", "bold", "heavy", "black"]] = "bold",
+                 legend_fontoutline: Optional[int] = None,
+                 colorbar_loc: Optional[str] = "right",
+                 size: Union[int, float, None] = None,
+                 color_map: str = None,
+                 palette: Union[str, Collection[str], None] = None,
+                 na_color: str = "lightgray",
+                 na_in_legend: bool = True,
+                 frameon: Optional[bool] = None,
+                 title: Union[str, Collection[str], None] = None,
+                 vmin: Union[str, float] = None,
+                 vmax: Union[str, float] = None,
+                 vcenter: Union[str, float] = None,
+                 add_outline: Optional[bool] = False,
+                 outline_color: Tuple[str, str] = ("black", "white"),
+                 outline_width: Tuple[float, float] = (0.3, 0.05),
+                 ncols: int = 4,
+                 wspace: Optional[float] = None,
+                 hspace: float = 0.25,
+                 save: Union[str, bool, None] = "drawgraph.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.draw_graph(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class Embedding(OutputNode):
+    important_parameters = ["basis", "color", "save"]
+
+    def __init__(self,
+                 basis: str,
+                 color: Union[str, Sequence[str], None] = None,
+                 gene_symbols: Optional[str] = None,
+                 use_raw: Optional[bool] = None,
+                 edges: bool = False,
+                 edges_width: float = 0.1,
+                 edges_color: Union[str, Sequence[float], Sequence[str]] = "grey",
+                 neighbors_key: Optional[str] = None,
+                 arrows: bool = False,
+                 sort_order: bool = True,
+                 groups: Union[str, Collection[str], None] = None,
+                 dimensions: Union[Tuple[int, int], Collection[Tuple[int, int]], None] = None,
+                 components: Union[str, Collection[str], None] = None,
+                 projection: Literal["2d", "3d"] = "2d",
+                 legend_loc: str = "right margin",
+                 legend_fontsize: Union[int, float, Literal[
+                     "xx-small", "x-small", "small", "medium", "large", "x-large", "xx-large"], None] = None,
+                 legend_fontweight: Union[
+                     int, Literal["light", "normal", "medium", "semibold", "bold", "heavy", "black"]] = "bold",
+                 legend_fontoutline: Optional[int] = None,
+                 colorbar_loc: Optional[str] = "right",
+                 size: Union[int, float, None] = None,
+                 color_map: str = None,
+                 palette: Union[str, Collection[str], None] = None,
+                 na_color: str = "lightgray",
+                 na_in_legend: bool = True,
+                 frameon: Optional[bool] = None,
+                 title: Union[str, Collection[str], None] = None,
+                 vmin: Union[str, float] = None,
+                 vmax: Union[str, float] = None,
+                 vcenter: Union[str, float] = None,
+                 add_outline: Optional[bool] = False,
+                 outline_color: Tuple[str, str] = ("black", "white"),
+                 outline_width: Tuple[float, float] = (0.3, 0.05),
+                 ncols: int = 4,
+                 wspace: Optional[float] = None,
+                 hspace: float = 0.25,
+                 save: Union[str, bool, None] = "embedding.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.embedding(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class EmbeddingDensity(OutputNode):
+    important_parameters = ["basis"]
+
+    def __init__(self,
+                 basis: str = "umap",
+                 key: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 group: Union[str, Collection[str], None] = "all",
+                 colormap: str = "YlOrRd",
+                 bg_dotsize: Optional[int] = 80,
+                 fg_dotsize: Optional[int] = 180,
+                 vmin: Union[str, float] = None,
+                 vmax: Union[str, float] = None,
+                 vcenter: Union[str, float] = None,
+                 ncols: int = 4,
+                 wspace: Optional[float] = None,
+                 hspace: float = 0.25,
+                 save: Union[bool, str] = "embedding_density.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.embedding_density(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class DPTTimeseries(OutputNode):
+    important_parameters = ["save"]
+
+    def __init__(self,
+                 color_map: str = None,
+                 as_heatmap: bool = True,
+                 save: Union[bool, str] = "dpt_timeseries.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.dpt_timeseries(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class PAGA(OutputNode):
+    important_parameters = ["threshold", "save"]
+
+    def __init__(self,
+                 threshold: Optional[float] = None,
+                 color: Union[str] = None,
+                 labels: Union[str, Sequence[str], None] = None,
+                 pos: Optional[str] = None,
+                 layout: Optional[Literal["fa", "fr", "rt", "rt_circular", "drl", "eq_tree", Ellipsis]] = None,
+                 random_state: Optional[int] = 0,
+                 root: Union[int, str, Sequence[int], None] = 0,
+                 transitions: Optional[str] = None,
+                 solid_edges: str = "connectivities",
+                 dashed_edges: Optional[str] = None,
+                 single_component: bool = False,
+                 fontsize: Optional[int] = None,
+                 fontoutline: Optional[int] = None,
+                 node_size_power: float = 0.5,
+                 edge_with_scale: float = 1.0,
+                 min_edge_width: Optional[float] = None,
+                 max_edge_width: Optional[float] = None,
+                 arrowsize: int = 30,
+                 normalize_to_color: bool = False,
+                 cmap: Optional[str] = None,
+                 add_pos: bool = True,
+                 title: Optional[str] = None,
+                 save: Union[bool, str] = "paga.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.paga(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroups(OutputNode):
+    important_parameters = ["n_genes", "sharey"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str], None] = None,
+                 gene_symbols: Optional[str] = None,
+                 n_genes: int = 20,
+                 fontsize: int = 8,
+                 ncols: int = 4,
+                 sharey: bool = True,
+                 save: Union[bool, str] = "rank_genes_groups.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsViolin(OutputNode):
+    important_parameters = ["save", "groups", "n_genes", "split"]
+
+    def __init__(self,
+                 groups: Optional[Sequence[str]] = None,
+                 n_genes: int = 20,
+                 gene_names: Optional[Collection[str]] = None,
+                 gene_symbols: Optional[str] = None,
+                 use_raw: Optional[bool] = None,
+                 split: bool = True,
+                 scale: str = "width",
+                 strip: bool = True,
+                 jitter: Union[int, float, bool] = True,
+                 size: int = 1,
+                 save: Union[bool, str] = "rank_genes_groups_violin.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_violin(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsStackedViolin(OutputNode):
+    important_parameters = ["save", "n_genes"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str]] = None,
+                 n_genes: Optional[int] = None,
+                 gene_symbols: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 min_logfoldchange: Optional[float] = None,
+                 key: Optional[str] = None,
+                 save: Union[bool, str] = "rank_genes_groups_stacked_violin.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_stacked_violin(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsHeatmap(OutputNode):
+    important_parameters = ["save", "n_genes"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str], None] = None,
+                 n_genes: Optional[int] = None,
+                 gene_symbols: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 min_logfoldchange: Optional[float] = None,
+                 key: Optional[str] = None,
+                 save: Union[bool, str] = "rank_genes_groups_heatmap.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_heatmap(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsDotPlot(OutputNode):
+    important_parameters = ["save", "n_genes"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str], None] = None,
+                 n_genes: Optional[int] = None,
+                 gene_symbols: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 min_logfoldchange: Optional[float] = None,
+                 key: Optional[str] = None,
+                 values_to_plot: Optional[Literal["scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
+                 var_names: Union[Sequence[str], None] = None,
+                 save: Union[bool, str] = "rank_genes_groups_dotplot.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars)
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_dotplot(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsMatrixplot(OutputNode):
+    important_parameters = ["save", "n_genes"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str], None] = None,
+                 n_genes: Optional[int] = None,
+                 gene_symbols: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 min_logfoldchange: Optional[float] = None,
+                 key: Optional[str] = None,
+                 values_to_plot: Optional[Literal["scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
+                 var_names: Union[Sequence[str], None] = None,
+                 save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_matrixplot(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroupsTracksplot(OutputNode):
+    important_parameters = ["save", "n_genes"]
+
+    def __init__(self,
+                 groups: Union[str, Sequence[str], None] = None,
+                 n_genes: Optional[int] = None,
+                 gene_symbols: Optional[str] = None,
+                 groupby: Optional[str] = None,
+                 min_logfoldchange: Optional[float] = None,
+                 key: Optional[str] = None,
+                 values_to_plot: Optional[Literal[
+                     "scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
+                 var_names: Union[Sequence[str], None] = None,
+                 save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.rank_genes_groups_tracksplot(ann_data, **self.parameters)
         self._terminate(ann_data)
         return

@@ -3,26 +3,6 @@ from typing import Collection, Optional, Literal, Union, Sequence, Tuple
 from pscs_api import PipelineNode
 
 
-class PCA(PipelineNode):
-    important_parameters = ["n_comps", "zero_center"]
-
-    def __init__(self,
-                 n_comps: Optional[int] = None,
-                 zero_center: Optional[bool] = True,
-                 svd_solver: Literal["arpack", "randomized", "auto", "lobpcg"] = "arpack",
-                 random_state: Union[None, int] = 0,
-                 use_highly_variable: Optional[bool] = None):
-        super().__init__()
-        self.store_vars_as_parameters(**vars())
-        return
-
-    def run(self):
-        ann_data = self._previous[0].result
-        tl.pca(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
-
-
 class TSNE(PipelineNode):
     important_parameters = ["n_pcs", "perplexity"]
 
@@ -235,5 +215,116 @@ class PAGA(PipelineNode):
     def run(self):
         ann_data = self._previous[0].result
         tl.paga(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class Ingest(PipelineNode):
+    important_parameters = []
+
+    def __init__(self,
+                 obs: Union[str, Collection[str]] = ("umap", "pca"),
+                 embedding_method: Union[Literal["umap", "pca"], Collection[Literal["umap", "pca"]]] = ("umap", "pca"),
+                 labeling_method: Literal["knn"] = "knn",
+                 neighbors_key: Optional[str] = None):
+        super().__init__()
+        self.num_inputs = 2
+        self.store_vars_as_parameters(**vars(), inplace=True)
+        return
+
+    def run(self):
+        # This node has two inputs
+        ann_data = self._previous[0].result
+        ann_data_ref = self._previous[1].result
+        tl.ingest(ann_data, ann_data_ref, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class RankGenesGroups(PipelineNode):
+    important_parameters = ["groupby"]
+
+    def __init__(self,
+                 groupby: str,
+                 use_raw: Optional[bool] = None,
+                 layer: Optional[str] = None,
+                 groups: Union[Literal["all"], Collection[str]] = "all",
+                 reference: str = "rest",
+                 n_genes: Optional[int] =None,
+                 method: Optional[Literal["logreg", "t-test", "wilcoxon", "t-test_overestim_var"]] = None,
+                 corr_method: Literal["benjamini-hochberg", "bonferroni"] = "benjamini-hochberg",
+                 tie_correct: bool = False,
+                 rankby_abs: bool = False,
+                 pts: bool = False,
+                 key_added: Optional[str] = None):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.rank_genes_groups(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class FilterRankGenesGroups(PipelineNode):
+    important_parameters = ["groupby"]
+
+    def __init__(self,
+                 key: str = None,
+                 groupby: str = None,
+                 use_raw: Optional[bool] = None,
+                 key_added: str = "rank_genes_groups_filtered",
+                 min_in_group_fraction: float = 0.25,
+                 min_fold_change: float = 1,
+                 max_out_group_fraction: float = 0.5,
+                 compare_abs: bool = False):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.filter_rank_genes_groups(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class ScoreGenes(PipelineNode):
+    important_parameters = ["gene_list", "ctrl_size"]
+
+    def __init__(self,
+                 gene_list: Sequence[str],
+                 ctrl_size: int = 50,
+                 gene_pool: Optional[Sequence[str]] = None,
+                 n_bins: int = 25,
+                 score_name: str = "score",
+                 random_state: Union[None, int] = 0,
+                 use_raw: Optional[bool] = None):
+        super().__init__()
+        self.store_vars_as_parameters(**vars(), copy=False)  # similar to inplace
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.score_genes(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class ScoreGenesCellCycle(PipelineNode):
+    important_parameters = ["s_genes", "g2m_gnes"]
+
+    def __init__(self,
+                 s_genes: Sequence[str],
+                 g2m_genes: Sequence[str]):
+        super().__init__()
+        self.store_vars_as_parameters(**vars(), copy=False)
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.score_genes_cell_cycle(ann_data, **self.parameters)
         self._terminate(ann_data)
         return

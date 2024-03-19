@@ -2,4 +2,3 @@ scanpy
 setuptools
 anndata
 pandas
-pscs_api@git+ssh://git@github.com/AlexandreHutton/pscs_api@main
