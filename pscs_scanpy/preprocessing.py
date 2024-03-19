@@ -29,7 +29,7 @@ class CalculateQCMetrics(PipelineNode):
 
 
 class FilterCells(PipelineNode):
-    important_parameters = None
+    important_parameters = ["min_counts", "max_counts", "min_genes", "max_genes"]
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -57,7 +57,7 @@ class FilterCells(PipelineNode):
 
 
 class FilterGenes(PipelineNode):
-    important_parameters = None
+    important_parameters = ["min_counts", "max_counts", "min_cells", "max_cells"]
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -111,7 +111,7 @@ class HighlyVariableGenes(PipelineNode):
 
 
 class Log1p(PipelineNode):
-    important_parameters = None
+    important_parameters = ["base"]
 
     def __init__(self,
                  base: Optional[float] = None,
@@ -210,7 +210,7 @@ class Scale(PipelineNode):
 
 
 class Subsample(PipelineNode):
-    important_parameters = None
+    important_parameters = ["fraction", "n_obs"]
 
     def __init__(self,
                  fraction: Optional[float] = None,

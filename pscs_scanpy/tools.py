@@ -1,5 +1,5 @@
 from scanpy import tools as tl
-from typing import Collection, Optional, Literal, Union, Sequence, Tuple
+from typing import Collection, Optional, Literal, Union, Sequence, Tuple, Mapping
 from pscs_api import PipelineNode
 
 
@@ -26,7 +26,7 @@ class TSNE(PipelineNode):
 
 
 class UMAP(PipelineNode):
-    important_parameters = None
+    important_parameters = ["n_components"]
 
     def __init__(self,
                  min_dist: float = 0.5,
@@ -54,7 +54,7 @@ class UMAP(PipelineNode):
 
 
 class DrawGraph(PipelineNode):
-    important_parameters = None
+    important_parameters = []
 
     def __init__(self,
                  layout: Literal['fr', 'drl', 'kk', 'grid_fr', 'lgl', 'rt', 'rt_circular', 'fa'] = "fa",
@@ -93,7 +93,7 @@ class DiffMap(PipelineNode):
 
 
 class EmbeddingDensity(PipelineNode):
-    important_parameters = None
+    important_parameters = ["basis"]
 
     def __init__(self,
                  basis: str = "umap",
@@ -220,7 +220,7 @@ class PAGA(PipelineNode):
 
 
 class Ingest(PipelineNode):
-    important_parameters = []
+    important_parameters = ["obs"]
 
     def __init__(self,
                  obs: Union[str, Collection[str]] = ("umap", "pca"),
@@ -326,5 +326,27 @@ class ScoreGenesCellCycle(PipelineNode):
     def run(self):
         ann_data = self._previous[0].result
         tl.score_genes_cell_cycle(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class MarkerGeneOverlap(PipelineNode):
+    important_parameters = ["reference_markers"]
+
+    def __init__(self,
+                 reference_markers: Union[Mapping[str, Collection], list],
+                 key: str = "rank_genes_groups",
+                 method: Literal["overlap_count", "overlap_coef", "jaccard"] = "overlap_count",
+                 normalize: Optional[Literal["reference", "data"]] = None,
+                 top_n_markers: Optional[int] =None,
+                 adj_pval_threshold: Optional[float] = None,
+                 key_added: str = "marker_gene_overlap"):
+        super().__init__()
+        self.store_vars_as_parameters(**vars(), inplace=True)
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.marker_gene_overlap(ann_data, **self.parameters)
         self._terminate(ann_data)
         return

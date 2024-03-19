@@ -276,7 +276,7 @@ class ClusterMap(OutputNode):
 
 
 class Ranking(OutputNode):
-    important_parameters = None
+    important_parameters = []
 
     def __init__(self,
                  attr: Literal["var", "obs", "uns", "varm", "obsm"],
