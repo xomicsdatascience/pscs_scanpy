@@ -221,6 +221,7 @@ class PAGA(PipelineNode):
 
 class Ingest(PipelineNode):
     important_parameters = ["obs"]
+    num_inputs = 2
 
     def __init__(self,
                  obs: Union[str, Collection[str]] = ("umap", "pca"),
@@ -228,7 +229,6 @@ class Ingest(PipelineNode):
                  labeling_method: Literal["knn"] = "knn",
                  neighbors_key: Optional[str] = None):
         super().__init__()
-        self.num_inputs = 2
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
 
