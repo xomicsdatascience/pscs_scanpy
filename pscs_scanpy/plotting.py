@@ -73,9 +73,9 @@ class HeatMap(OutputNode):
 
 
 class DotPlot(OutputNode):
-    important_parameters = ["var_names", "groupy", "save"]
+    important_parameters = ["var_names", "groupby", "save"]
     def __init__(self,
-                 var_names: Union[str, Collection],
+                 var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
                  use_raw: Optional[bool] = None,
                  log: bool = False,
@@ -116,7 +116,7 @@ class DotPlot(OutputNode):
 
 
 class TracksPlot(OutputNode):
-    important_parameters = ["var_names", "groupy", "save"]
+    important_parameters = ["var_names", "groupby", "save"]
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Collection[str]],
@@ -145,7 +145,7 @@ class TracksPlot(OutputNode):
 
 
 class Violin(OutputNode):
-    important_parameters = ["keys", "groupy", "save"]
+    important_parameters = ["keys", "groupby", "save"]
     def __init__(self,
                  keys: Union[str, Collection[str]],
                  groupby: Optional[str] = None,
@@ -175,7 +175,7 @@ class Violin(OutputNode):
 
 
 class StackedViolin(OutputNode):
-    important_parameters = ["var_names", "groupy", "save"]
+    important_parameters = ["var_names", "groupby", "save"]
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
@@ -218,7 +218,7 @@ class StackedViolin(OutputNode):
 
 
 class MatrixPlot(OutputNode):
-    important_parameters = ["var_names", "groupy", "save"]
+    important_parameters = ["var_names", "groupby", "save"]
 
     def __init__(self,
                  var_names: Union[str, Collection[str]],

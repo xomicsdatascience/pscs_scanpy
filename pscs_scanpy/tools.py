@@ -162,7 +162,7 @@ class Dendrogram(PipelineNode):
     important_parameters = ["groupby", "n_pcs"]
 
     def __init__(self,
-                 groupy: Collection[str],
+                 groupby: Collection[str],
                  n_pcs: Optional[int] = None,
                  use_rep: Optional[str] = None,
                  var_names: Optional[Collection[str]] = None,
