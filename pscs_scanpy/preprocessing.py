@@ -180,7 +180,7 @@ class RegressOut(PipelineNode):
                  keys: Union[str, Sequence[str]] = None,
                  n_jobs: Optional[int] = None):
         super().__init__()
-        self.store_vars_as_parameters(**vars(), inplace=True)
+        self.store_vars_as_parameters(**vars())
         return
 
     def run(self):
