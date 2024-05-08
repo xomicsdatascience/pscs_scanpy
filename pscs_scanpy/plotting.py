@@ -3,11 +3,20 @@ from pathlib import Path
 import scanpy as sc
 from scanpy import plotting as pl
 from typing import Optional, Sequence, Literal, Collection, Union, Tuple
-from pscs_api import OutputNode
-
+from pscs_api import OutputNode, Interaction
+from pscs_api.base import InteractionList
+from pscs_api.base import istr
 
 class Scatter(OutputNode):
     important_parameters = ["x", "y", "save"]
+    requirements = (InteractionList(Interaction(obs=[istr("x")]),
+                                   Interaction(var=[istr("x")]),
+                                   Interaction(var_names=[istr("x")])) *
+                    InteractionList(Interaction(obs=[istr("y")]),
+                                    Interaction(var=[istr("y")]),
+                                    Interaction(var_names=[istr("y")])) *
+                    InteractionList(Interaction(layers=[istr("layers")])) *
+                    InteractionList(Interaction(obs=[istr("groups")])))
 
     def __init__(self,
                  x: Optional[str] = None,
@@ -39,6 +48,10 @@ class Scatter(OutputNode):
 
 class HeatMap(OutputNode):
     important_parameters = ["var_names", "groupby", "save"]
+    requirements = InteractionList(var_names=[istr("var_names"), istr("var_group_positions")],
+                                   obs=[istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")])
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Collection[str]],
@@ -74,6 +87,9 @@ class HeatMap(OutputNode):
 
 class DotPlot(OutputNode):
     important_parameters = ["var_names", "groupby", "save"]
+    requirements = InteractionList(var_names=[istr("var_names")],
+                                    obs=[istr("groupby")],
+                                    var=[istr("gene_symbols")])
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
@@ -117,6 +133,9 @@ class DotPlot(OutputNode):
 
 class TracksPlot(OutputNode):
     important_parameters = ["var_names", "groupby", "save"]
+    requirements = InteractionList(var_names=[istr("var_names")],
+                                    obs=[istr("groupby")],
+                                    var=[istr("gene_symbols")])
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Collection[str]],
@@ -146,6 +165,10 @@ class TracksPlot(OutputNode):
 
 class Violin(OutputNode):
     important_parameters = ["keys", "groupby", "save"]
+    requirements = (InteractionList(Interaction(var_names=[istr("keys")]),
+                                    Interaction(obs=[istr("keys")])) *
+                    InteractionList(obs=[istr("groupby")],
+                                    layers=[istr("layer")]))
     def __init__(self,
                  keys: Union[str, Collection[str]],
                  groupby: Optional[str] = None,
@@ -176,6 +199,10 @@ class Violin(OutputNode):
 
 class StackedViolin(OutputNode):
     important_parameters = ["var_names", "groupby", "save"]
+    requirements = InteractionList(var_names=[istr("var_names")],
+                                   obs=[istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")])
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
@@ -219,6 +246,10 @@ class StackedViolin(OutputNode):
 
 class MatrixPlot(OutputNode):
     important_parameters = ["var_names", "groupby", "save"]
+    requirements = InteractionList(var_names=[istr("var_names")],
+                                   obs=[istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")])
 
     def __init__(self,
                  var_names: Union[str, Collection[str]],
@@ -257,6 +288,7 @@ class MatrixPlot(OutputNode):
 
 class ClusterMap(OutputNode):
     important_parameters = ["obs_keys", "save"]
+    requirements = InteractionList(obs=[istr("obs_keys")])
 
     def __init__(self,
                  obs_keys: Optional[str] = None,
@@ -277,6 +309,11 @@ class ClusterMap(OutputNode):
 
 class Ranking(OutputNode):
     important_parameters = []
+    requirements = InteractionList(Interaction(obs=[istr("keys")]),
+                                   Interaction(var=[istr("keys")]),
+                                   Interaction(uns=[istr("keys")]),
+                                   Interaction(varm=[istr("keys")]),
+                                   Interaction(obsm=[istr("keys")]))
 
     def __init__(self,
                  attr: Literal["var", "obs", "uns", "varm", "obsm"],
@@ -296,6 +333,8 @@ class Ranking(OutputNode):
 
 class Dendrogram(OutputNode):
     important_parameters = ["groupby", "save"]
+    requirements = InteractionList(obs=[istr("groupby")],
+                                   uns=[istr("dendrogram_key")])
 
     def __init__(self,
                  groupby: str,
@@ -318,6 +357,7 @@ class Dendrogram(OutputNode):
 
 class HighestExprGenes(OutputNode):
     important_parameters = ["n_top", "save"]
+    requirements = InteractionList(var=[istr("gene_symbols")])
 
     def __init__(self,
                  n_top: int = 30,
@@ -375,8 +415,13 @@ class HighlyVariableGenes(OutputNode):
         return
 
 
-class PCAPlot(OutputNode):
+class PCA(OutputNode):
     important_parameters = ["color", "save"]
+    requirements = (InteractionList(Interaction(obs=[istr("color")]),
+                                   Interaction(var_names=[istr("color")])) *
+                    InteractionList(var=[istr("gene_symbols")],
+                                    layers=[istr("layer")],
+                                    obs=[istr("groups")]))
 
     def __init__(self,
                  color: Union[str, Collection[str], None] = None,
@@ -467,6 +512,7 @@ class PCAVarianceRatio(OutputNode):
 
 class PCAOverview(OutputNode):
     important_parameters = ["save"]
+    requirements = InteractionList(obs=[istr("color"), istr("groups")])
 
     def __init__(self,
                  color: Union[str, Collection[str], None] = None,
@@ -516,6 +562,10 @@ class PCAOverview(OutputNode):
 
 class TSNE(OutputNode):
     important_parameters = ["save"]
+    requirements = InteractionList(obs=[istr("color")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")],
+                                   uns=[istr("neighbors_key")])
 
     def __init__(self,
                  color: Union[str, Sequence[str]] = None,
@@ -569,6 +619,10 @@ class TSNE(OutputNode):
 
 class UMAP(OutputNode):
     important_parameters = ["save"]
+    requirements = InteractionList(obs=[istr("color"), istr("groups")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")],
+                                   uns=[istr("neighbors_key")])
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -620,6 +674,9 @@ class UMAP(OutputNode):
 
 class DiffMap(OutputNode):
     important_parameters = ["save"]
+    requirements = InteractionList(obs=[istr("color"), istr("groups")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")])
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -674,6 +731,10 @@ class DiffMap(OutputNode):
 
 class DrawGraph(OutputNode):
     important_parameters = ["color", "save"]
+    requirements = InteractionList(obs=[istr("color")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")],
+                                   uns=[istr("neighbors_key")])
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -730,6 +791,11 @@ class DrawGraph(OutputNode):
 
 class Embedding(OutputNode):
     important_parameters = ["basis", "color", "save"]
+    requirements = InteractionList(obsm=[istr("basis")],
+                                   obs=[istr("color"), istr("groups")],
+                                   var=[istr("gene_symbols")],
+                                   layers=[istr("layer")],
+                                   uns=[istr("neighbors_key")])
 
     def __init__(self,
                  basis: str,
@@ -785,6 +851,8 @@ class Embedding(OutputNode):
 
 class EmbeddingDensity(OutputNode):
     important_parameters = ["basis"]
+    requirements = InteractionList(obsm=["X_" + istr("basis")],
+                                   obs=[istr("key"), istr("groupby"), istr("group")])
 
     def __init__(self,
                  basis: str = "umap",
@@ -836,6 +904,8 @@ class DPTTimeseries(OutputNode):
 
 class PAGA(OutputNode):
     important_parameters = ["threshold", "save"]
+    requirements = InteractionList(Interaction(obs="color"),
+                                   Interaction(var_names="color"))
 
     def __init__(self,
                  threshold: Optional[float] = None,
@@ -876,6 +946,8 @@ class PAGA(OutputNode):
 
 class RankGenesGroups(OutputNode):
     important_parameters = ["n_genes", "sharey"]
+    requirements = InteractionList(obs=[istr("groups")],
+                                   var=[istr("gene_symbols")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -900,6 +972,9 @@ class RankGenesGroups(OutputNode):
 
 class RankGenesGroupsViolin(OutputNode):
     important_parameters = ["save", "groups", "n_genes", "split"]
+    requirements = InteractionList(obs=[istr("groups")],
+                                   var_names=[istr("gene_names")],
+                                   var=[istr("gene_symbols")])
 
     def __init__(self,
                  groups: Optional[Sequence[str]] = None,
@@ -928,6 +1003,9 @@ class RankGenesGroupsViolin(OutputNode):
 
 class RankGenesGroupsStackedViolin(OutputNode):
     important_parameters = ["save", "n_genes"]
+    requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   uns=[istr("key")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str]] = None,
@@ -952,6 +1030,9 @@ class RankGenesGroupsStackedViolin(OutputNode):
 
 class RankGenesGroupsHeatmap(OutputNode):
     important_parameters = ["save", "n_genes"]
+    requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   uns=[istr("key")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -976,6 +1057,10 @@ class RankGenesGroupsHeatmap(OutputNode):
 
 class RankGenesGroupsDotPlot(OutputNode):
     important_parameters = ["save", "n_genes"]
+    requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   uns=[istr("key")],
+                                   var_names=[istr("var_names")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1002,6 +1087,10 @@ class RankGenesGroupsDotPlot(OutputNode):
 
 class RankGenesGroupsMatrixplot(OutputNode):
     important_parameters = ["save", "n_genes"]
+    requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   uns=[istr("key")],
+                                   var_names=[istr("var_names")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1028,6 +1117,9 @@ class RankGenesGroupsMatrixplot(OutputNode):
 
 class RankGenesGroupsTracksplot(OutputNode):
     important_parameters = ["save", "n_genes"]
+    requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
+                                   var=[istr("gene_symbols")],
+                                   uns=[istr("key")])
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,

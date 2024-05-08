@@ -3,10 +3,22 @@ import math
 import scanpy as sc
 from scanpy import preprocessing as pp
 from pscs_api import PipelineNode
-
+from pscs_api.base import InteractionList, Interaction, istr
 
 class CalculateQCMetrics(PipelineNode):
     important_parameters = ["expr_type", "var_type"]
+    requirements = InteractionList(var=[istr("qc_vars")],
+                                   layers=[istr("layer")])
+    effects = InteractionList(obs=["total_"+istr("var_type")+"_by_"+istr("expr_type"),
+                                   "total_"+istr("expr_type"),
+                                   f"pct_{istr('expr_type')}_in_top_{istr('percent_top')}_{istr('var_type')}",
+                                   f"total_{istr('expr_type')}_{istr('qc_vars')}",
+                                   f"pct_{istr('expr_type')}_{istr('qc_vars')}"],
+                              var=[f"total_{istr('expr_type')}",
+                                   f"n_genes_by_{istr('expr_type')}",
+                                   f"mean_{istr('expr_type')}",
+                                   f"n_cells_by_{istr('expr_type')}",
+                                   f"pct_dropout_by_{istr('expr_type')}"])
 
     def __init__(self,
                  expr_type: str = "counts",
@@ -30,6 +42,9 @@ class CalculateQCMetrics(PipelineNode):
 
 class FilterCells(PipelineNode):
     important_parameters = ["min_counts", "max_counts", "min_genes", "max_genes"]
+    effects = InteractionList(Interaction(obs=["n_genes"]),
+                              Interaction(obs=["n_counts"]))
+    effects = effects * effects
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -58,6 +73,9 @@ class FilterCells(PipelineNode):
 
 class FilterGenes(PipelineNode):
     important_parameters = ["min_counts", "max_counts", "min_cells", "max_cells"]
+    effects = InteractionList(Interaction(var=["n_counts"]),
+                              Interaction(var=["n_cells"]))
+    effects = effects * effects
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -86,6 +104,10 @@ class FilterGenes(PipelineNode):
 
 class HighlyVariableGenes(PipelineNode):
     important_parameters = ["n_top_genes"]
+    requirements = InteractionList(layers=[istr("layer")],
+                                   obs=[istr("batch_key")])
+    effects = InteractionList(var=["highly_variable", "means", "dispersions", "dispersions_norm", "variances", "variances_norm",
+                                   "highly_variable_rank", "highly_variable_nbatches", "highly_variable_intersection"])
 
     def __init__(self,
                  layer: Optional[str] = None,
@@ -112,6 +134,8 @@ class HighlyVariableGenes(PipelineNode):
 
 class Log1p(PipelineNode):
     important_parameters = ["base"]
+    requirements = InteractionList(layers=[istr("layer")],
+                                   obsm=[istr("obsm")])
 
     def __init__(self,
                  base: Optional[float] = None,
@@ -132,6 +156,11 @@ class Log1p(PipelineNode):
 
 class PCA(PipelineNode):
     important_parameters = ["n_comps", "zero_center"]
+    requirements = InteractionList(layers=[istr("layer")],
+                                   var=[istr("mask_var")])
+    effects = InteractionList(obsm=["X_pca"],
+                              varm=["PCs"],
+                              uns=["pca"])
 
     def __init__(self,
                  n_comps: Optional[int] = None,
@@ -155,6 +184,8 @@ class PCA(PipelineNode):
 
 class NormalizeTotal(PipelineNode):
     important_parameters = ["target_sum", "exclude_highly_expressed"]
+    requirements = InteractionList(layers=[istr("layer")])
+    effects = InteractionList(obs=[istr("key_added")])
 
     def __init__(self,
                  target_sum: Optional[float] = None,
@@ -175,6 +206,9 @@ class NormalizeTotal(PipelineNode):
 
 class RegressOut(PipelineNode):
     important_parameters = ["keys"]
+    requirements = InteractionList(obs=[istr("keys")],
+                                   layers=[istr("layer")])
+    effects = InteractionList(layers=[istr("layer")])
 
     def __init__(self,
                  keys: Union[str, Sequence[str]] = None,
@@ -192,6 +226,11 @@ class RegressOut(PipelineNode):
 
 class Scale(PipelineNode):
     important_parameters = ["zero_center"]
+    requirements = InteractionList(layers=[istr("layer")],
+                                   obsm=[istr("obsm")],
+                                   obs=[istr("mask_obs")])
+    effects = InteractionList(layers=[istr("layer")],
+                              var=["mean", "std", "var"])
 
     def __init__(self,
                  zero_center: bool = True,
@@ -248,6 +287,7 @@ class DownsampleCounts(PipelineNode):
 
 class Combat(PipelineNode):
     important_parameters = ["covariates"]
+    requirements = InteractionList(obs=[istr("key"), istr("covariates")])
 
     def __init__(self,
                  key: str = "batch",
@@ -265,6 +305,11 @@ class Combat(PipelineNode):
 
 class Neighbors(PipelineNode):
     important_parameters = ["n_neighbors", "n_pcs"]
+    requirements = InteractionList(obsm=[istr("use_rep")])
+    effects = (InteractionList(uns=["neighbors"],
+                              obsp=["distances", "connectivities"]) *
+               Interaction(uns=[istr("key_added")],
+                           obsp=[istr("key_added")+"_distances", istr("key_added")+"_connectivities"]))
 
     def __init__(self,
                  n_neighbors: int = 15,

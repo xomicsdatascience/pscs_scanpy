@@ -1,10 +1,13 @@
 from scanpy import tools as tl
 from typing import Collection, Optional, Literal, Union, Sequence, Tuple, Mapping
 from pscs_api import PipelineNode
-
+from pscs_api.base import istr, InteractionList, Interaction
 
 class TSNE(PipelineNode):
     important_parameters = ["n_pcs", "perplexity"]
+    requirements = InteractionList(obsm=[istr("use_rep")])
+    effects = InteractionList(obsm=["X_tsne"],
+                              uns=["tsne"])
 
     def __init__(self,
                  n_pcs: Optional[int] = None,
@@ -27,6 +30,11 @@ class TSNE(PipelineNode):
 
 class UMAP(PipelineNode):
     important_parameters = ["n_components"]
+    requirements = (InteractionList(uns=["neighbors"],
+                                   obsp=["connectivities"]) *
+                    InteractionList(uns=[istr("neighbors_key")]))
+    effects = InteractionList(obsm=["X_umap"],
+                              uns=["umap"])
 
     def __init__(self,
                  min_dist: float = 0.5,
@@ -55,6 +63,11 @@ class UMAP(PipelineNode):
 
 class DrawGraph(PipelineNode):
     important_parameters = []
+    requirements = InteractionList(Interaction(obsp=["connectivities"]),
+                                   Interaction(obsp=[istr("obsp")]))
+    effects = (InteractionList(Interaction(obsm=["X_draw_graph_" + istr("layout")]),
+                              Interaction(obsm=["X_draw_graph_" + istr("key_added_ext")])) *
+                InteractionList(uns=["draw_graph"]))
 
     def __init__(self,
                  layout: Literal['fr', 'drl', 'kk', 'grid_fr', 'lgl', 'rt', 'rt_circular', 'fa'] = "fa",
@@ -77,6 +90,11 @@ class DrawGraph(PipelineNode):
 
 class DiffMap(PipelineNode):
     important_parameters = ["n_comps"]
+    requirements = InteractionList(Interaction(uns=["neighbors"],
+                                                     obsp=["connectivities", "distances"]),
+                                   Interaction(uns=[istr("neighbors_key")]))
+    effects = InteractionList(obsm=["X_diffmap"],
+                              uns=["diffmap_evals"])
 
     def __init__(self,
                  n_comps: int = 15,
@@ -94,6 +112,10 @@ class DiffMap(PipelineNode):
 
 class EmbeddingDensity(PipelineNode):
     important_parameters = ["basis"]
+    requirements = InteractionList(obsm=["X_"+istr("basis")],
+                                   obs=[istr("groupby")])
+    effects = InteractionList(obs=[istr("key_added")],
+                              uns=[istr("key_added")+"_params"])
 
     def __init__(self,
                  basis: str = "umap",
@@ -113,6 +135,9 @@ class EmbeddingDensity(PipelineNode):
 
 class Leiden(PipelineNode):
     important_parameters = ["resolution"]
+    requirements = InteractionList(Interaction(obsp=["connectivities"]),
+                                   Interaction(obsp=[istr("obsp")]))
+    effects = InteractionList(obs=[istr("key_added")])
 
     def __init__(self,
                  resolution: float = 1,
@@ -137,6 +162,9 @@ class Leiden(PipelineNode):
 
 class Louvain(PipelineNode):
     important_parameters = ["resolution"]
+    requirements = InteractionList(Interaction(obsp=["connectivities"]),
+                                   Interaction(obsp=[istr("obsp")]))
+    effects = InteractionList(obs=[istr("key_added")])
 
     def __init__(self,
                  resolution: Optional[float] = None,
@@ -160,6 +188,9 @@ class Louvain(PipelineNode):
 
 class Dendrogram(PipelineNode):
     important_parameters = ["groupby", "n_pcs"]
+    requirements = InteractionList(obsm=[istr("use_rep")])
+    effects = InteractionList(Interaction(uns=["dendrogram_"+istr("groupby")]),
+                              Interaction(uns=[istr("key_added")]))
 
     def __init__(self,
                  groupby: Collection[str],
@@ -183,6 +214,10 @@ class Dendrogram(PipelineNode):
 
 class DPT(PipelineNode):
     important_parameters = ["n_dcs", "n_branchings", "min_group_size"]
+    requirements = InteractionList(Interaction(uns=["neighbors"],
+                                               obsp=["connectivities", "distances"]),
+                                   Interaction(uns=[istr("neighbors_key")]))
+    effects = InteractionList(obs=["dpt_pseudotime", "dpt_groups"])
 
     def __init__(self,
                  n_dcs: int = 10,
@@ -202,6 +237,13 @@ class DPT(PipelineNode):
 
 class PAGA(PipelineNode):
     important_parameters = ["groups"]
+    requirements = (InteractionList(Interaction(obs=[istr("groups")]),
+                                   Interaction(obs=["leiden"]),
+                                   Interaction(obs=["louvain"])) *
+                    InteractionList(Interaction(uns=["neighbors"],
+                                                obsp=["connectivities", "distances"]),
+                                    Interaction(uns=[istr("neighbors_key")])))
+    effects = InteractionList(uns=["connectivities", "connectivities_tree"])
 
     def __init__(self,
                  groups: Optional[str] = None,
@@ -222,6 +264,12 @@ class PAGA(PipelineNode):
 class Ingest(PipelineNode):
     important_parameters = ["obs"]
     num_inputs = 2
+    requirements = (InteractionList(obs=[istr("obs")]) *
+                    InteractionList(Interaction(uns=["neighbors"],
+                                                obsp=["distances"]),
+                                    Interaction(uns=[istr("neighbors_key")])))
+    effect = InteractionList(obs=[istr("obs")],
+                             obsm=["X_"+istr("embedding_method")])
 
     def __init__(self,
                  obs: Union[str, Collection[str]] = ("umap", "pca"),
@@ -243,6 +291,10 @@ class Ingest(PipelineNode):
 
 class RankGenesGroups(PipelineNode):
     important_parameters = ["groupby"]
+    requirements = InteractionList(obs=[istr("groupby"), istr("groups")],
+                                   layers=[istr("layer")])
+    effects = InteractionList(Interaction(uns=["rank_genes_groups"]),
+                              Interaction(uns=[istr("key_added")]))
 
     def __init__(self,
                  groupby: str,
@@ -270,6 +322,8 @@ class RankGenesGroups(PipelineNode):
 
 class FilterRankGenesGroups(PipelineNode):
     important_parameters = ["groupby"]
+    requirements = InteractionList(obs=[istr("key"), istr("groupby")])
+    effects = InteractionList(obs=[istr("key_added")])
 
     def __init__(self,
                  key: str = None,
@@ -293,6 +347,8 @@ class FilterRankGenesGroups(PipelineNode):
 
 class ScoreGenes(PipelineNode):
     important_parameters = ["gene_list", "ctrl_size"]
+    requirements = InteractionList(var_names=[istr("gene_list"), istr("gene_pool")])
+    effects = InteractionList(obs=[istr("score_name")])
 
     def __init__(self,
                  gene_list: Sequence[str],
@@ -315,6 +371,8 @@ class ScoreGenes(PipelineNode):
 
 class ScoreGenesCellCycle(PipelineNode):
     important_parameters = ["s_genes", "g2m_gnes"]
+    requirements = InteractionList(var_names=[istr("s_genes"), istr("g2m_genes")])
+    effects = InteractionList(obs=["S_score", "G2M_score", "phase"])
 
     def __init__(self,
                  s_genes: Sequence[str],
@@ -348,5 +406,33 @@ class MarkerGeneOverlap(PipelineNode):
     def run(self):
         ann_data = self._previous[0].result
         tl.marker_gene_overlap(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
+
+class PCA(PipelineNode):
+    important_parameters = ["n_comps", "zero_center"]
+    requirements = InteractionList(layers=[istr("layer")],
+                                   var=[istr("mask_var")])
+    effects = InteractionList(obsm=["X_pca"],
+                              varm=["PCs"],
+                              uns=["pca"])
+
+    def __init__(self,
+                 n_comps: Optional[int] = None,
+                 zero_center: Optional[bool] = True,
+                 svd_solver: Literal["arpack", "randomized", "auto", "lobpcg"] = "arpack",
+                 random_state: Union[None, int] = 0,
+                 use_highly_variable: Optional[bool] = None,
+                 dtype: str = 'float32',
+                 chunked: bool = False,
+                 chunk_size: Optional[int] = None):
+        super().__init__()
+        self.store_vars_as_parameters(**vars())
+        return
+
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.pca(ann_data, **self.parameters)
         self._terminate(ann_data)
         return
