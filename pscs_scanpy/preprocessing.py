@@ -308,7 +308,7 @@ class Neighbors(PipelineNode):
     requirements = InteractionList(obsm=[istr("use_rep")])
     effects = (InteractionList(uns=["neighbors"],
                               obsp=["distances", "connectivities"]) *
-               Interaction(uns=[istr("key_added")],
+               InteractionList(uns=[istr("key_added")],
                            obsp=[istr("key_added")+"_distances", istr("key_added")+"_connectivities"]))
 
     def __init__(self,

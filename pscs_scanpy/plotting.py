@@ -618,11 +618,15 @@ class TSNE(OutputNode):
 
 
 class UMAP(OutputNode):
-    important_parameters = ["save"]
-    requirements = InteractionList(obs=[istr("color"), istr("groups")],
-                                   var=[istr("gene_symbols")],
-                                   layers=[istr("layer")],
-                                   uns=[istr("neighbors_key")])
+    important_parameters = ["color", "save"]
+    requirements = (InteractionList(Interaction(obs=[istr("color")]),
+                                   Interaction(var_names=[istr("color")])) *
+                    InteractionList(obs=[istr("groups")],
+                                    obsm=["X_umap"],
+                                    var=[istr("gene_symbols")],
+                                    layers=[istr("layer")],
+                                    uns=[istr("neighbors_key"), "umap"]) *
+                    InteractionList(Interaction(obsp=["connectivities"])))
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
