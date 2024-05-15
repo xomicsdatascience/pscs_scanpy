@@ -156,8 +156,6 @@ class Log1p(PipelineNode):
 
 class PCA(PipelineNode):
     important_parameters = ["n_comps", "zero_center"]
-    requirements = InteractionList(layers=[istr("layer")],
-                                   var=[istr("mask_var")])
     effects = InteractionList(obsm=["X_pca"],
                               varm=["PCs"],
                               uns=["pca"])

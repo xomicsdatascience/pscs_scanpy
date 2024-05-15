@@ -620,7 +620,8 @@ class TSNE(OutputNode):
 class UMAP(OutputNode):
     important_parameters = ["color", "save"]
     requirements = (InteractionList(Interaction(obs=[istr("color")]),
-                                   Interaction(var_names=[istr("color")])) *
+                                   Interaction(var_names=[istr("color")]),
+                                    Interaction(var=[istr("color")])) *
                     InteractionList(obs=[istr("groups")],
                                     obsm=["X_umap"],
                                     var=[istr("gene_symbols")],
