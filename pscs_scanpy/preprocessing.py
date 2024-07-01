@@ -113,7 +113,7 @@ class HighlyVariableGenes(PipelineNode):
                  layer: Optional[str] = None,
                  n_top_genes: Optional[int] = None,
                  min_mean: Optional[float] = 0.0125,
-                 max_mea: Optional[float] = 3,
+                 max_mean: Optional[float] = 3,
                  min_disp: Optional[float] = 0.5,
                  max_disp: Optional[float] = str(math.inf),
                  span: Optional[float] = 0.3,

@@ -23,7 +23,7 @@ class TSNE(PipelineNode):
 
     def run(self):
         ann_data = self._previous[0].result
-        tl.tsne(**self.parameters)
+        tl.tsne(ann_data, **self.parameters)
         self._terminate(ann_data)
         return
 
@@ -107,6 +107,7 @@ class DiffMap(PipelineNode):
     def run(self):
         ann_data = self._previous[0].result
         tl.diffmap(ann_data, **self.parameters)
+        self._terminate(ann_data)
         return
 
 
@@ -249,7 +250,7 @@ class PAGA(PipelineNode):
                  groups: Optional[str] = None,
                  use_rna_velocity: bool = False,
                  model: Literal["v1.2", "v1.0"] = "v1.2",
-                 neigbors_key: Optional[str] = None):
+                 neighbors_key: Optional[str] = None):
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
