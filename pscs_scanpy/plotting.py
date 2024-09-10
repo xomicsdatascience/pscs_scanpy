@@ -228,7 +228,7 @@ class StackedViolin(OutputNode):
                  scale: Literal["area", "count", "width"] = "width",
                  yticklabels: Optional[bool] = False,
                  row_palette: Optional[str] = None,
-                 save: Union[bool] = "stackedviolin.png",
+                 save: Union[str, bool] = "stackedviolin.png",
                  vmin: Optional[float] = None,
                  vmax: Optional[float] = None,
                  vcenter: Optional[float] = None):

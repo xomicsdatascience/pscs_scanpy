@@ -209,7 +209,7 @@ class RegressOut(PipelineNode):
     effects = InteractionList(layers=[istr("layer")])
 
     def __init__(self,
-                 keys: Union[str, Sequence[str]] = None,
+                 keys: Union[str, Sequence[str]],
                  n_jobs: Optional[int] = None):
         super().__init__()
         self.store_vars_as_parameters(**vars())
