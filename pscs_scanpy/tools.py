@@ -35,6 +35,7 @@ class UMAP(PipelineNode):
                     InteractionList(uns=[istr("neighbors_key")]))
     effects = InteractionList(obsm=["X_umap"],
                               uns=["umap"])
+    function = tl.umap
 
     def __init__(self,
                  min_dist: float = 0.5,
@@ -52,12 +53,6 @@ class UMAP(PipelineNode):
                  neighbors_key: Optional[str] = None):
         super().__init__()
         self.store_vars_as_parameters(**vars())
-        return
-
-    def run(self):
-        ann_data = self._previous[0].result
-        tl.umap(ann_data, **self.parameters)
-        self._terminate(ann_data)
         return
 
 
