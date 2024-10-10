@@ -1078,7 +1078,7 @@ class RankGenesGroupsDotPlot(OutputNode):
                  var_names: Union[Sequence[str], None] = None,
                  save: Union[bool, str] = "rank_genes_groups_dotplot.png"):
         super().__init__()
-        self.store_vars_as_parameters(**vars)
+        self.store_vars_as_parameters(**vars())
         return
 
     def run(self):
