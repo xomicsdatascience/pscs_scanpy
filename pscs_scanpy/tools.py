@@ -55,6 +55,12 @@ class UMAP(PipelineNode):
         self.store_vars_as_parameters(**vars())
         return
 
+    def run(self):
+        ann_data = self._previous[0].result
+        tl.umap(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
+
 
 class DrawGraph(PipelineNode):
     important_parameters = []
