@@ -3,11 +3,13 @@ from pathlib import Path
 import scanpy as sc
 from scanpy import plotting as pl
 from typing import Optional, Sequence, Literal, Collection, Union, Tuple
-from pscs_api import OutputNode, Interaction
+from pscs_api import Interaction, PlottingNode
 from pscs_api.base import InteractionList
 from pscs_api.base import istr
+from matplotlib import pyplot as plt
 
-class Scatter(OutputNode):
+
+class Scatter(PlottingNode):
     important_parameters = ["x", "y", "save"]
     requirements = (InteractionList(Interaction(obs=[istr("x")]),
                                    Interaction(var=[istr("x")]),
@@ -17,6 +19,9 @@ class Scatter(OutputNode):
                                     Interaction(var_names=[istr("y")])) *
                     InteractionList(Interaction(layers=[istr("layers")])) *
                     InteractionList(Interaction(obs=[istr("groups")])))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.scatter.html"
+    function = sc.pl.scatter
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  x: Optional[str] = None,
@@ -33,28 +38,26 @@ class Scatter(OutputNode):
                  color_map: str = None,
                  title: Optional[str] = None,
                  save: Union[str, bool, None] = "scatter.png"):
+        self.function = sc.pl.scatter
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
-        return
-
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.scatter(ann_data, **self.parameters)
-        self._terminate(ann_data)
+        self.save_path = self.parameters["save"]
         return
 
 
-class HeatMap(OutputNode):
+class HeatMap(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
     requirements = InteractionList(var_names=[istr("var_names"), istr("var_group_positions")],
                                    obs=[istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.heatmap.html"
+    function = sc.pl.heatmap
+    __doc__ = PlottingNode.set_doc(function, doc_url)
+
     def __init__(self,
                  var_names: Union[str, Collection[str]],
-                 groupby: Union[str, Collection[str]],
+                 groupby: Union[str, Collection[str]] = None,
                  use_raw: Optional[bool] = None,
                  log: bool = False,
                  num_categories: int = 7,
@@ -72,24 +75,38 @@ class HeatMap(OutputNode):
                  vmin: Optional[float] = None,
                  vmax: Optional[float] = None,
                  vcenter: Optional[float] = None):
+        self.function = sc.pl.heatmap
+        if groupby is None:
+            groupby = []
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
+        self.save_path = self.parameters["save"]
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.heatmap(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     if self.function is None:
+    #         raise ValueError(f"Node {self} has set function to run; either define one or overwrite the run() method.")
+    #     ann_data = self.input_data[0]
+    #     params = self.parameters.copy()  # need to extract the 'save' parameter
+    #
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.save_path = params["save"]
+    #     del params["save"]
+    #     ax_dict = self.function(ann_data, **params)
+    #     fig = ax_dict[list(ax_dict.keys())[0]].get_figure()
+    #     self._terminate(ann_data)
+    #     self.save_figure(fig)
+    #     return
 
-
-class DotPlot(OutputNode):
+class DotPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
     requirements = InteractionList(var_names=[istr("var_names")],
                                     obs=[istr("groupby")],
                                     var=[istr("gene_symbols")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.dotplot.html"
+    function = sc.pl.dotplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
+
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
@@ -118,24 +135,29 @@ class DotPlot(OutputNode):
                  vmin: Optional[float] = None,
                  vmax: Optional[float] = None,
                  vcenter: Optional[float] = None):
+        self.function = sc.pl.dotplot
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.dotplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.dotplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class TracksPlot(OutputNode):
+class TracksPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
     requirements = InteractionList(var_names=[istr("var_names")],
                                     obs=[istr("groupby")],
                                     var=[istr("gene_symbols")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.tracksplot.html"
+    function = sc.pl.tracksplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
+
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Collection[str]],
@@ -150,25 +172,30 @@ class TracksPlot(OutputNode):
                  var_group_rotation: Optional[float] = None,
                  layer: Optional[str] = None,
                  save: Union[str, bool, None] = "tracksplot.png"):
+        self.function = sc.pl.tracksplot
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.dotplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.dotplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class Violin(OutputNode):
+class Violin(PlottingNode):
     important_parameters = ["keys", "groupby", "save"]
     requirements = (InteractionList(Interaction(var_names=[istr("keys")]),
                                     Interaction(obs=[istr("keys")])) *
                     InteractionList(obs=[istr("groupby")],
                                     layers=[istr("layer")]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.violin.html"
+    function = sc.pl.violin
+    __doc__ = PlottingNode.set_doc(function, doc_url)
+
     def __init__(self,
                  keys: Union[str, Collection[str]],
                  groupby: Optional[str] = None,
@@ -185,24 +212,29 @@ class Violin(OutputNode):
                  ylabel: Union[str, Collection[str], None] = None,
                  rotation: Optional[float] = None,
                  save: Union[str, bool, None] = "violin.png"):
+        self.function = sc.pl.violim
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.violin(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.violin(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class StackedViolin(OutputNode):
+class StackedViolin(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
     requirements = InteractionList(var_names=[istr("var_names")],
                                    obs=[istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.tracksplot.html"
+    function = sc.pl.tracksplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
+
     def __init__(self,
                  var_names: Union[str, Collection[str]],
                  groupby: Union[str, Sequence[str]],
@@ -232,24 +264,28 @@ class StackedViolin(OutputNode):
                  vmin: Optional[float] = None,
                  vmax: Optional[float] = None,
                  vcenter: Optional[float] = None):
+        self.function = sc.pl.stacked_violin
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.stacked_violin(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.stacked_violin(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class MatrixPlot(OutputNode):
+class MatrixPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
     requirements = InteractionList(var_names=[istr("var_names")],
                                    obs=[istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.matrixplot.html"
+    function = sc.pl.matrixplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  var_names: Union[str, Collection[str]],
@@ -273,68 +309,80 @@ class MatrixPlot(OutputNode):
                  vmin: Optional[float] = None,
                  vmax: Optional[float] = None,
                  vcenter: Optional[float] = None):
+        self.function = sc.pl.matrixplot
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.matrixplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.matrixplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class ClusterMap(OutputNode):
+class ClusterMap(PlottingNode):
     important_parameters = ["obs_keys", "save"]
     requirements = InteractionList(obs=[istr("obs_keys")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.clustermap.html"
+    function = sc.pl.clustermap
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  obs_keys: Optional[str] = None,
                  use_raw: Optional[bool] = None,
                  save: Union[str, bool, None] = "clustermap.png"):
+        self.function = sc.pl.clustermap
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.clustermap(ann_data)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.clustermap(ann_data)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class Ranking(OutputNode):
+class Ranking(PlottingNode):
     important_parameters = []
     requirements = InteractionList(Interaction(obs=[istr("keys")]),
                                    Interaction(var=[istr("keys")]),
                                    Interaction(uns=[istr("keys")]),
                                    Interaction(varm=[istr("keys")]),
                                    Interaction(obsm=[istr("keys")]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.ranking.html"
+    function = sc.pl.ranking
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  attr: Literal["var", "obs", "uns", "varm", "obsm"],
                  keys: Union[str, Collection[str]]):
+        self.function = sc.pl.ranking
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.ranking(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.ranking(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class Dendrogram(OutputNode):
+class Dendrogram(PlottingNode):
     important_parameters = ["groupby", "save"]
     requirements = InteractionList(obs=[istr("groupby")],
                                    uns=[istr("dendrogram_key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pl.dendrogram.html"
+    function = sc.pl.dendrogram
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groupby: str,
@@ -342,86 +390,101 @@ class Dendrogram(OutputNode):
                  orientation: Literal["top", "bottom", "left", "right"] = "top",
                  remove_labels: bool = False,
                  save: Union[str, bool, None] = "dendrogram.png"):
+        self.function = sc.pl.dendrogram
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.dendrogram(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.dendrogram(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class HighestExprGenes(OutputNode):
+class HighestExprGenes(PlottingNode):
     important_parameters = ["n_top", "save"]
     requirements = InteractionList(var=[istr("gene_symbols")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.highest_expr_genes.html"
+    function = sc.pl.highest_expr_genes
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_top: int = 30,
                  save: Union[str, bool, None] = "highestexprgenes.png",
                  gene_symbols: Optional[str] = None,
                  log: bool = False):
+        self.function = sc.pl.highest_expr_genes
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.highest_expr_genes(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.highest_expr_genes(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class FilterGenesDispersion(OutputNode):
+class FilterGenesDispersion(PlottingNode):
     important_parameters = ["save"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.filter_genes_dispersion.html"
+    function = sc.pl.filter_genes_dispersion
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  log: bool = False,
                  save: Union[str, bool, None] = "filtergenesdisp.png"):
+        self.function = sc.pl.filter_genes_dispersion
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.filter_genes_dispersion(ann_data)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.filter_genes_dispersion(ann_data)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class HighlyVariableGenes(OutputNode):
+class HighlyVariableGenes(PlottingNode):
     important_parameters = ["save"]
-
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.highly_variable_genes.html"
+    function = sc.pl.highly_variable_genes
+    __doc__ = PlottingNode.set_doc(function, doc_url)
     def __init__(self,
                  log: bool = False,
                  save: Union[str, bool, None] = "highlyvariablegenes.png"):
+        self.function = sc.pl.highest_expr_genes
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.highly_variable_genes(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.highly_variable_genes(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class PCA(OutputNode):
+class PCA(PlottingNode):
     important_parameters = ["color", "save"]
     requirements = (InteractionList(Interaction(obs=[istr("color")]),
                                    Interaction(var_names=[istr("color")])) *
                     InteractionList(var=[istr("gene_symbols")],
                                     layers=[istr("layer")],
                                     obs=[istr("groups")]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.pca.html"
+    function = sc.pl.pca
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Collection[str], None] = None,
@@ -456,63 +519,75 @@ class PCA(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[str, bool, None] = "pcaplot.png"):
+        self.function = sc.pl.pca
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.pca(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.pca(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class PCALoadings(OutputNode):
+class PCALoadings(PlottingNode):
     important_parameters = ["components", "save"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.pca_loadings.html"
+    function = sc.pl.pca_loadings
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  components: Union[str, Sequence[int], None] = None,
                  include_lowest: bool = True,
                  n_points: Optional[bool] = None,
                  save: Union[str, bool, None] = "pcaloadings.png"):
+        self.function = sc.pl.pca_loadings
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.pca_loadings(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.pca_loadings(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class PCAVarianceRatio(OutputNode):
+class PCAVarianceRatio(PlottingNode):
     important_parameters = ["n_pcs", "save"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.pca_variance_ratio.html"
+    function = sc.pl.pca_variance_ratio
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_pcs: int = 30,
                  log: bool = False,
                  save: Union[str, bool, None] = "pcavarianceratio.png"):
+        self.function = sc.pl.pca_variance_ratio
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.pca_variance_ratio(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.pca_variance_ratio(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class PCAOverview(OutputNode):
+class PCAOverview(PlottingNode):
     important_parameters = ["save"]
     requirements = InteractionList(obs=[istr("color"), istr("groups")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.pca_overview.html"
+    function = sc.pl.pca_overview
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Collection[str], None] = None,
@@ -547,25 +622,29 @@ class PCAOverview(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[str, bool, None] = "pcaoverview.png"):
+        self.function = sc.pl.pca_overview
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.pca_overview(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.pca_overview(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class TSNE(OutputNode):
+class TSNE(PlottingNode):
     important_parameters = ["save"]
     requirements = InteractionList(obs=[istr("color")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")],
                                    uns=[istr("neighbors_key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.tsne.html"
+    function = sc.pl.tsne
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Sequence[str]] = None,
@@ -604,20 +683,21 @@ class TSNE(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[bool, str, None] = "tsne.png"):
+        self.function = sc.pl.tsne
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.tsne(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.tsne(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class UMAP(OutputNode):
+class UMAP(PlottingNode):
     important_parameters = ["color", "save"]
     requirements = (InteractionList(Interaction(obs=[istr("color")]),
                                    Interaction(var_names=[istr("color")]),
@@ -628,6 +708,9 @@ class UMAP(OutputNode):
                                     layers=[istr("layer")],
                                     uns=[istr("neighbors_key"), "umap"]) *
                     InteractionList(Interaction(obsp=["connectivities"])))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.umap.html"
+    function = sc.pl.umap
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -664,24 +747,29 @@ class UMAP(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[bool, str, None] = "umap.png"):
+        self.function = sc.pl.umap
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
+        # self.save_path = self.parameters["save"]
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.umap(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.umap(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class DiffMap(OutputNode):
+class DiffMap(PlottingNode):
     important_parameters = ["save"]
     requirements = InteractionList(obs=[istr("color"), istr("groups")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.diffmap.html"
+    function = sc.pl.diffmap
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -721,25 +809,29 @@ class DiffMap(OutputNode):
                  hspace: float = 0.25,
                  save: Union[bool, str, None] = "diffmap.png"
                  ):
+        self.function = sc.pl.diffmap
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.diffmap(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.diffmap(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class DrawGraph(OutputNode):
+class DrawGraph(PlottingNode):
     important_parameters = ["color", "save"]
     requirements = InteractionList(obs=[istr("color")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")],
                                    uns=[istr("neighbors_key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.draw_graph.html"
+    function = sc.pl.draw_graph
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color: Union[str, Sequence[str], None] = None,
@@ -781,26 +873,30 @@ class DrawGraph(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[str, bool, None] = "drawgraph.png"):
+        self.function = sc.pl.draw_graph
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.draw_graph(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.draw_graph(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class Embedding(OutputNode):
+class Embedding(PlottingNode):
     important_parameters = ["basis", "color", "save"]
     requirements = InteractionList(obsm=[istr("basis")],
                                    obs=[istr("color"), istr("groups")],
                                    var=[istr("gene_symbols")],
                                    layers=[istr("layer")],
                                    uns=[istr("neighbors_key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.embedding.html"
+    function = sc.pl.embedding
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  basis: str,
@@ -841,23 +937,27 @@ class Embedding(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[str, bool, None] = "embedding.png"):
+        self.function = sc.pl.embedding
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.embedding(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.embedding(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class EmbeddingDensity(OutputNode):
+class EmbeddingDensity(PlottingNode):
     important_parameters = ["basis"]
     requirements = InteractionList(obsm=["X_" + istr("basis")],
                                    obs=[istr("key"), istr("groupby"), istr("group")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.embedding_density.html"
+    function = sc.pl.embedding_density
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  basis: str = "umap",
@@ -874,43 +974,51 @@ class EmbeddingDensity(OutputNode):
                  wspace: Optional[float] = None,
                  hspace: float = 0.25,
                  save: Union[bool, str] = "embedding_density.png"):
+        self.function = sc.pl.embedding_density
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.embedding_density(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.embedding_density(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class DPTTimeseries(OutputNode):
+class DPTTimeseries(PlottingNode):
     important_parameters = ["save"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.dpt_timeseries.html"
+    function = sc.pl.dpt_timeseries
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  color_map: str = None,
                  as_heatmap: bool = True,
                  save: Union[bool, str] = "dpt_timeseries.png"):
+        self.function = sc.pl.dpt_timeseries
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.dpt_timeseries(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.dpt_timeseries(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class PAGA(OutputNode):
+class PAGA(PlottingNode):
     important_parameters = ["threshold", "save"]
     requirements = InteractionList(Interaction(obs="color"),
                                    Interaction(var_names="color"))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.paga.html"
+    function = sc.pl.paga
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  threshold: Optional[float] = None,
@@ -936,23 +1044,27 @@ class PAGA(OutputNode):
                  add_pos: bool = True,
                  title: Optional[str] = None,
                  save: Union[bool, str] = "paga.png"):
+        self.function = sc.pl.paga
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.paga(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.paga(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroups(OutputNode):
+class RankGenesGroups(PlottingNode):
     important_parameters = ["n_genes", "sharey"]
     requirements = InteractionList(obs=[istr("groups")],
                                    var=[istr("gene_symbols")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups.html"
+    function = sc.pl.rank_genes_groups
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -962,24 +1074,28 @@ class RankGenesGroups(OutputNode):
                  ncols: int = 4,
                  sharey: bool = True,
                  save: Union[bool, str] = "rank_genes_groups.png"):
+        self.function = sc.pl.rank_genes_groups
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsViolin(OutputNode):
+class RankGenesGroupsViolin(PlottingNode):
     important_parameters = ["save", "groups", "n_genes", "split"]
     requirements = InteractionList(obs=[istr("groups")],
                                    var_names=[istr("gene_names")],
                                    var=[istr("gene_symbols")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_violin.html"
+    function = sc.pl.rank_genes_groups_violin
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Optional[Sequence[str]] = None,
@@ -993,24 +1109,28 @@ class RankGenesGroupsViolin(OutputNode):
                  jitter: Union[int, float, bool] = True,
                  size: int = 1,
                  save: Union[bool, str] = "rank_genes_groups_violin.png"):
+        self.function = sc.pl.rank_genes_groups_violin
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_violin(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_violin(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsStackedViolin(OutputNode):
+class RankGenesGroupsStackedViolin(PlottingNode):
     important_parameters = ["save", "n_genes"]
     requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    uns=[istr("key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_stacked_violin.html"
+    function = sc.pl.rank_genes_groups_stacked_violin
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str]] = None,
@@ -1020,24 +1140,28 @@ class RankGenesGroupsStackedViolin(OutputNode):
                  min_logfoldchange: Optional[float] = None,
                  key: Optional[str] = None,
                  save: Union[bool, str] = "rank_genes_groups_stacked_violin.png"):
+        self.function = sc.pl.rank_genes_groups_stacked_violin
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_stacked_violin(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_stacked_violin(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsHeatmap(OutputNode):
+class RankGenesGroupsHeatmap(PlottingNode):
     important_parameters = ["save", "n_genes"]
     requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    uns=[istr("key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_heatmap.html"
+    function = sc.pl.rank_genes_groups_heatmap
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1047,25 +1171,29 @@ class RankGenesGroupsHeatmap(OutputNode):
                  min_logfoldchange: Optional[float] = None,
                  key: Optional[str] = None,
                  save: Union[bool, str] = "rank_genes_groups_heatmap.png"):
+        self.function = sc.pl.rank_genes_groups_heatmap
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_heatmap(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_heatmap(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsDotPlot(OutputNode):
+class RankGenesGroupsDotPlot(PlottingNode):
     important_parameters = ["save", "n_genes"]
     requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    uns=[istr("key")],
                                    var_names=[istr("var_names")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_dotplot.html"
+    function = sc.pl.rank_genes_groups_dotplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1077,25 +1205,29 @@ class RankGenesGroupsDotPlot(OutputNode):
                  values_to_plot: Optional[Literal["scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
                  var_names: Union[Sequence[str], None] = None,
                  save: Union[bool, str] = "rank_genes_groups_dotplot.png"):
+        self.function = sc.pl.rank_genes_groups_dotplot
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_dotplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_dotplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsMatrixplot(OutputNode):
+class RankGenesGroupsMatrixplot(PlottingNode):
     important_parameters = ["save", "n_genes"]
     requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    uns=[istr("key")],
                                    var_names=[istr("var_names")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_matrixplot.html"
+    function = sc.pl.rank_genes_groups_matrixplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1107,24 +1239,28 @@ class RankGenesGroupsMatrixplot(OutputNode):
                  values_to_plot: Optional[Literal["scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
                  var_names: Union[Sequence[str], None] = None,
                  save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
+        self.function = sc.pl.rank_genes_groups_matrixplot
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_matrixplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_matrixplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
-class RankGenesGroupsTracksplot(OutputNode):
+class RankGenesGroupsTracksplot(PlottingNode):
     important_parameters = ["save", "n_genes"]
     requirements = InteractionList(obs=[istr("groups"), istr("groupby")],
                                    var=[istr("gene_symbols")],
                                    uns=[istr("key")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.rank_genes_groups_tracksplot.html"
+    function = sc.pl.rank_genes_groups_tracksplot
+    __doc__ = PlottingNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Union[str, Sequence[str], None] = None,
@@ -1137,14 +1273,15 @@ class RankGenesGroupsTracksplot(OutputNode):
                      "scores", "logfoldchanges", "pvals", "pvals_adj", "log10_pvals", "log10_pvals_adj"]] = None,
                  var_names: Union[Sequence[str], None] = None,
                  save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
+        self.function = sc.pl.rank_genes_groups_tracksplot
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-        self.parameters["save"] = os.path.basename(self.parameters["save"])
-        pl.rank_genes_groups_tracksplot(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
+    #     pl.rank_genes_groups_tracksplot(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return

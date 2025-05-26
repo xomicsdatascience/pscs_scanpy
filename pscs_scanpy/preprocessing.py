@@ -19,6 +19,9 @@ class CalculateQCMetrics(PipelineNode):
                                    f"mean_{istr('expr_type')}",
                                    f"n_cells_by_{istr('expr_type')}",
                                    f"pct_dropout_by_{istr('expr_type')}"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.calculate_qc_metrics.html"
+    function = sc.pp.calculate_qc_metrics
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  expr_type: str = "counts",
@@ -33,11 +36,11 @@ class CalculateQCMetrics(PipelineNode):
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        pp.calculate_qc_metrics(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     pp.calculate_qc_metrics(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
 class FilterCells(PipelineNode):
@@ -45,6 +48,9 @@ class FilterCells(PipelineNode):
     effects = InteractionList(Interaction(obs=["n_genes"]),
                               Interaction(obs=["n_counts"]))
     effects = effects * effects
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.filter_cells.html"
+    function = sc.pp.filter_cells
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -76,6 +82,9 @@ class FilterGenes(PipelineNode):
     effects = InteractionList(Interaction(var=["n_counts"]),
                               Interaction(var=["n_cells"]))
     effects = effects * effects
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.filter_genes.html"
+    function = sc.pp.filter_genes
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  min_counts: Optional[int] = None,
@@ -108,6 +117,9 @@ class HighlyVariableGenes(PipelineNode):
                                    obs=[istr("batch_key")])
     effects = InteractionList(var=["highly_variable", "means", "dispersions", "dispersions_norm", "variances", "variances_norm",
                                    "highly_variable_rank", "highly_variable_nbatches", "highly_variable_intersection"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.highly_variable_genes.html"
+    function = sc.pp.highly_variable_genes
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  layer: Optional[str] = None,
@@ -125,17 +137,20 @@ class HighlyVariableGenes(PipelineNode):
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
 
-    def run(self):
-        ann_data = self._previous[0].result
-        pp.highly_variable_genes(ann_data, **self.parameters)
-        self._terminate(ann_data)
-        return
+    # def run(self):
+    #     ann_data = self._previous[0].result
+    #     pp.highly_variable_genes(ann_data, **self.parameters)
+    #     self._terminate(ann_data)
+    #     return
 
 
 class Log1p(PipelineNode):
     important_parameters = ["base"]
     requirements = InteractionList(layers=[istr("layer")],
                                    obsm=[istr("obsm")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.log1p.html"
+    function = sc.pp.log1p
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  base: Optional[float] = None,
@@ -159,6 +174,9 @@ class PCA(PipelineNode):
     effects = InteractionList(obsm=["X_pca"],
                               varm=["PCs"],
                               uns=["pca"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.pca.html"
+    function = sc.pp.pca
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_comps: Optional[int] = None,
@@ -184,6 +202,9 @@ class NormalizeTotal(PipelineNode):
     important_parameters = ["target_sum", "exclude_highly_expressed"]
     requirements = InteractionList(layers=[istr("layer")])
     effects = InteractionList(obs=[istr("key_added")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.normalize_total.html"
+    function = sc.pp.normalize_total
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  target_sum: Optional[float] = None,
@@ -207,6 +228,9 @@ class RegressOut(PipelineNode):
     requirements = InteractionList(obs=[istr("keys")],
                                    layers=[istr("layer")])
     effects = InteractionList(layers=[istr("layer")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.regress_out.html"
+    function = sc.pp.regress_out
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  keys: Union[str, Sequence[str]],
@@ -229,6 +253,9 @@ class Scale(PipelineNode):
                                    obs=[istr("mask_obs")])
     effects = InteractionList(layers=[istr("layer")],
                               var=["mean", "std", "var"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.scale.html"
+    function = sc.pp.scale
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  zero_center: bool = True,
@@ -248,6 +275,9 @@ class Scale(PipelineNode):
 
 class Subsample(PipelineNode):
     important_parameters = ["fraction", "n_obs"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.subsample.html"
+    function = sc.pp.subsample
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  fraction: Optional[float] = None,
@@ -266,6 +296,9 @@ class Subsample(PipelineNode):
 
 class DownsampleCounts(PipelineNode):
     important_parameters = ["counts_per_cell", "total_counts"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.downsample_counts.html"
+    function = sc.pp.downsample_counts
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  counts_per_cell: Union[int, Collection[int], None] = None,
@@ -286,6 +319,9 @@ class DownsampleCounts(PipelineNode):
 class Combat(PipelineNode):
     important_parameters = ["covariates"]
     requirements = InteractionList(obs=[istr("key"), istr("covariates")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.combat.html"
+    function = sc.pp.combat
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  key: str = "batch",
@@ -308,6 +344,9 @@ class Neighbors(PipelineNode):
                               obsp=["distances", "connectivities"]) *
                InteractionList(uns=[istr("key_added")],
                            obsp=[istr("key_added")+"_distances", istr("key_added")+"_connectivities"]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.pp.neighbors.html"
+    function = sc.pp.neighbors
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_neighbors: int = 15,
