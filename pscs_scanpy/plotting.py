@@ -1035,7 +1035,7 @@ class PAGA(PlottingNode):
                  fontsize: Optional[int] = None,
                  fontoutline: Optional[int] = None,
                  node_size_power: float = 0.5,
-                 edge_with_scale: float = 1.0,
+                 edge_width_scale: float = 1.0,
                  min_edge_width: Optional[float] = None,
                  max_edge_width: Optional[float] = None,
                  arrowsize: int = 30,
