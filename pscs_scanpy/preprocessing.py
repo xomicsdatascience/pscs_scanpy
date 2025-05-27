@@ -32,6 +32,7 @@ class CalculateQCMetrics(PipelineNode):
                  use_raw: bool = False,
                  log1p: bool = True):
         # Assign all arguments to self.parameters
+        self.function = sc.pp.calculate_qc_metrics
         super().__init__()
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
@@ -57,6 +58,7 @@ class FilterCells(PipelineNode):
                  min_genes: Optional[int] = None,
                  max_counts: Optional[int] = None,
                  max_genes: Optional[int] = None):
+        self.function = sc.pp.filter_cells
         super().__init__()
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
@@ -91,6 +93,7 @@ class FilterGenes(PipelineNode):
                  min_cells: Optional[int] = None,
                  max_counts: Optional[int] = None,
                  max_cells: Optional[int] = None):
+        self.function = sc.pp.filter_genes
         super().__init__()
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
@@ -133,6 +136,7 @@ class HighlyVariableGenes(PipelineNode):
                  flavor: Literal['seurat', 'cell_ranger', 'seurat_v3'] = 'seurat',
                  subset: bool = False,
                  batch_key: Optional[str] = None):
+        self.function = sc.pp.highly_variable_genes
         super().__init__()
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
@@ -158,6 +162,7 @@ class Log1p(PipelineNode):
                  chunk_size: Optional[int] = None,
                  layer: Optional[str] = None,
                  obsm: Optional[str] = None):
+        self.function = sc.pp.log1p
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -187,6 +192,7 @@ class PCA(PipelineNode):
                  dtype: str = 'float32',
                  chunked: bool = False,
                  chunk_size: Optional[int] = None):
+        self.function = sc.pp.pca
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -212,6 +218,7 @@ class NormalizeTotal(PipelineNode):
                  max_fraction: float = 0.05,
                  key_added: Optional[str] = None,
                  layer: Optional[str] = None):
+        self.function = sc.pp.normalize_total
         super().__init__()
         self.store_vars_as_parameters(**vars(), inplace=True)
         return
@@ -235,6 +242,7 @@ class RegressOut(PipelineNode):
     def __init__(self,
                  keys: Union[str, Sequence[str]],
                  n_jobs: Optional[int] = None):
+        self.function = sc.pp.regress_out
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -262,6 +270,7 @@ class Scale(PipelineNode):
                  max_value: Optional[float] = None,
                  layer: Optional[str] = None,
                  obsm: Optional[str] = None):
+        self.function = sc.pp.scale
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -283,6 +292,7 @@ class Subsample(PipelineNode):
                  fraction: Optional[float] = None,
                  n_obs: Optional[int] = None,
                  random_state: Union[None, int] = 0):
+        self.function = sc.pp.subsample
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -305,6 +315,7 @@ class DownsampleCounts(PipelineNode):
                  total_counts: Optional[int] = None,
                  random_state: Union[None, int] = 0,
                  replace: bool = False):
+        self.function = sc.pp.downsample_counts
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -326,6 +337,7 @@ class Combat(PipelineNode):
     def __init__(self,
                  key: str = "batch",
                  covariates: Optional[Collection[str]] = None):
+        self.function = sc.pp.combat
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
@@ -360,6 +372,7 @@ class Neighbors(PipelineNode):
                                  'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener',
                                  'sokalsneath', 'sqeuclidean', 'yule'] = "euclidean",
                  key_added: Optional[str] = None):
+        self.function = sc.pp.neighbors
         super().__init__()
         self.store_vars_as_parameters(**vars())
         return
