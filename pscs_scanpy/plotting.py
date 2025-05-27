@@ -212,7 +212,7 @@ class Violin(PlottingNode):
                  ylabel: Union[str, Collection[str], None] = None,
                  rotation: Optional[float] = None,
                  save: Union[str, bool, None] = "violin.png"):
-        self.function = sc.pl.violim
+        self.function = sc.pl.violin
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
 
