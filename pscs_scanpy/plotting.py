@@ -7,6 +7,7 @@ from pscs_api import Interaction, PlottingNode
 from pscs_api.base import InteractionList
 from pscs_api.base import istr
 from matplotlib import pyplot as plt
+from typing import Collection
 
 
 class Scatter(PlottingNode):
@@ -42,6 +43,22 @@ class Scatter(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         self.save_path = self.parameters["save"]
+        return
+
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
         return
 
 
@@ -524,13 +541,21 @@ class PCA(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.pca(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class PCALoadings(PlottingNode):
@@ -627,13 +652,21 @@ class PCAOverview(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.pca_overview(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class TSNE(PlottingNode):
@@ -688,13 +721,21 @@ class TSNE(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.tsne(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class UMAP(PlottingNode):
@@ -753,13 +794,21 @@ class UMAP(PlottingNode):
         # self.save_path = self.parameters["save"]
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.umap(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class DiffMap(PlottingNode):
@@ -814,13 +863,21 @@ class DiffMap(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.diffmap(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class DrawGraph(PlottingNode):
@@ -878,13 +935,21 @@ class DrawGraph(PlottingNode):
         self.store_vars_as_parameters(**vars())
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.draw_graph(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class Embedding(PlottingNode):
@@ -942,13 +1007,21 @@ class Embedding(PlottingNode):
         self.store_vars_as_parameters(**vars())
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.embedding(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class EmbeddingDensity(PlottingNode):
@@ -1049,13 +1122,21 @@ class PAGA(PlottingNode):
         self.store_vars_as_parameters(**vars())
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.paga(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        if isinstance(self.parameters["color"], Collection):
+            # Scanpy will create multiple panels; instead, split to keep the figures editable
+            all_colors = self.parameters["color"].copy()
+            orig_save = self.parameters["save"]
+            for idx, c in enumerate(all_colors):
+                self.parameters["color"] = c
+                file_ext_split = os.path.splitext(self.parameters["save"])
+                self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
+                super().run()
+            self.parameters["color"] = all_colors
+            self.parameters["save"] = orig_save
+        elif isinstance(self.parameters["color"], str):
+            super().run()
+        return
 
 
 class RankGenesGroups(PlottingNode):
