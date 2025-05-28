@@ -50,9 +50,9 @@ class Scatter(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -546,9 +546,9 @@ class PCA(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -598,13 +598,13 @@ class PCAVarianceRatio(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.pca_variance_ratio(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
+    def run(self):
+        ann_data = self.input_data[0]
+        sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
+        self.parameters["save"] = os.path.basename(self.parameters["save"])
+        pl.pca_variance_ratio(ann_data, **self.parameters)
+        self._terminate(ann_data)
+        return
 
 
 class PCAOverview(PlottingNode):
@@ -657,9 +657,9 @@ class PCAOverview(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -726,9 +726,9 @@ class TSNE(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -799,9 +799,9 @@ class UMAP(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -868,9 +868,9 @@ class DiffMap(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -940,9 +940,9 @@ class DrawGraph(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -1012,9 +1012,9 @@ class Embedding(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
@@ -1127,9 +1127,9 @@ class PAGA(PlottingNode):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
+            file_ext_split = os.path.splitext(self.parameters["save"])
             for idx, c in enumerate(all_colors):
                 self.parameters["color"] = c
-                file_ext_split = os.path.splitext(self.parameters["save"])
                 self.parameters["save"] = file_ext_split[0] + "_" + str(idx) + file_ext_split[1]
                 super().run()
             self.parameters["color"] = all_colors
