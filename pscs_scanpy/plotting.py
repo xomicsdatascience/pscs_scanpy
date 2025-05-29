@@ -46,7 +46,9 @@ class Scatter(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -57,8 +59,6 @@ class Scatter(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -99,21 +99,7 @@ class HeatMap(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         self.save_path = self.parameters["save"]
         return
-
-    # def run(self):
-    #     if self.function is None:
-    #         raise ValueError(f"Node {self} has set function to run; either define one or overwrite the run() method.")
-    #     ann_data = self.input_data[0]
-    #     params = self.parameters.copy()  # need to extract the 'save' parameter
-    #
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.save_path = params["save"]
-    #     del params["save"]
-    #     ax_dict = self.function(ann_data, **params)
-    #     fig = ax_dict[list(ax_dict.keys())[0]].get_figure()
-    #     self._terminate(ann_data)
-    #     self.save_figure(fig)
-    #     return
+    
 
 class DotPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
@@ -157,14 +143,6 @@ class DotPlot(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.dotplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class TracksPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
@@ -193,14 +171,6 @@ class TracksPlot(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.dotplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class Violin(PlottingNode):
@@ -232,14 +202,6 @@ class Violin(PlottingNode):
         self.function = sc.pl.violin
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.violin(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class StackedViolin(PlottingNode):
@@ -285,14 +247,6 @@ class StackedViolin(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.stacked_violin(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class MatrixPlot(PlottingNode):
     important_parameters = ["var_names", "groupby", "save"]
@@ -331,14 +285,6 @@ class MatrixPlot(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.matrixplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class ClusterMap(PlottingNode):
     important_parameters = ["obs_keys", "save"]
@@ -355,14 +301,6 @@ class ClusterMap(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.clustermap(ann_data)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class Ranking(PlottingNode):
@@ -384,14 +322,6 @@ class Ranking(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.ranking(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class Dendrogram(PlottingNode):
     important_parameters = ["groupby", "save"]
@@ -412,14 +342,6 @@ class Dendrogram(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.dendrogram(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class HighestExprGenes(PlottingNode):
     important_parameters = ["n_top", "save"]
@@ -438,14 +360,6 @@ class HighestExprGenes(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.highest_expr_genes(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class FilterGenesDispersion(PlottingNode):
     important_parameters = ["save"]
@@ -461,14 +375,6 @@ class FilterGenesDispersion(PlottingNode):
         self.store_vars_as_parameters(**vars(), show=False)
         return
 
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.filter_genes_dispersion(ann_data)
-    #     self._terminate(ann_data)
-    #     return
-
 
 class HighlyVariableGenes(PlottingNode):
     important_parameters = ["save"]
@@ -482,14 +388,6 @@ class HighlyVariableGenes(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.highly_variable_genes(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class PCA(PlottingNode):
@@ -542,7 +440,9 @@ class PCA(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -553,8 +453,6 @@ class PCA(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -573,14 +471,6 @@ class PCALoadings(PlottingNode):
         super().__init__()
         self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.pca_loadings(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class PCAVarianceRatio(PlottingNode):
@@ -653,7 +543,9 @@ class PCAOverview(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -664,8 +556,6 @@ class PCAOverview(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -722,7 +612,9 @@ class TSNE(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -733,8 +625,6 @@ class TSNE(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -795,7 +685,9 @@ class UMAP(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -806,8 +698,6 @@ class UMAP(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -864,7 +754,9 @@ class DiffMap(PlottingNode):
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -875,8 +767,6 @@ class DiffMap(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -932,11 +822,13 @@ class DrawGraph(PlottingNode):
                  save: Union[str, bool, None] = "drawgraph.png"):
         self.function = sc.pl.draw_graph
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -947,8 +839,6 @@ class DrawGraph(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -1004,11 +894,13 @@ class Embedding(PlottingNode):
                  save: Union[str, bool, None] = "embedding.png"):
         self.function = sc.pl.embedding
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -1019,8 +911,6 @@ class Embedding(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -1049,16 +939,8 @@ class EmbeddingDensity(PlottingNode):
                  save: Union[bool, str] = "embedding_density.png"):
         self.function = sc.pl.embedding_density
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.embedding_density(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class DPTTimeseries(PlottingNode):
@@ -1073,22 +955,14 @@ class DPTTimeseries(PlottingNode):
                  save: Union[bool, str] = "dpt_timeseries.png"):
         self.function = sc.pl.dpt_timeseries
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.dpt_timeseries(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class PAGA(PlottingNode):
     important_parameters = ["threshold", "save"]
-    requirements = InteractionList(Interaction(obs="color"),
-                                   Interaction(var_names="color"))
+    requirements = InteractionList(Interaction(obs=[istr("color")]),
+                                   Interaction(var_names=[istr("color")]))
     doc_url = "https://scanpy.readthedocs.io/en/stable/api/generated/scanpy.pl.paga.html"
     function = sc.pl.paga
     __doc__ = PlottingNode.set_doc(function, doc_url)
@@ -1119,11 +993,13 @@ class PAGA(PlottingNode):
                  save: Union[bool, str] = "paga.png"):
         self.function = sc.pl.paga
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
 
     def run(self):
-        if isinstance(self.parameters["color"], Collection):
+        if isinstance(self.parameters["color"], str) or self.parameters["color"] is None:
+            super().run()
+        elif isinstance(self.parameters["color"], Collection):
             # Scanpy will create multiple panels; instead, split to keep the figures editable
             all_colors = self.parameters["color"].copy()
             orig_save = self.parameters["save"]
@@ -1134,8 +1010,6 @@ class PAGA(PlottingNode):
                 super().run()
             self.parameters["color"] = all_colors
             self.parameters["save"] = orig_save
-        elif isinstance(self.parameters["color"], str):
-            super().run()
         return
 
 
@@ -1157,16 +1031,8 @@ class RankGenesGroups(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups.png"):
         self.function = sc.pl.rank_genes_groups
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsViolin(PlottingNode):
@@ -1192,16 +1058,8 @@ class RankGenesGroupsViolin(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_violin.png"):
         self.function = sc.pl.rank_genes_groups_violin
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_violin(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsStackedViolin(PlottingNode):
@@ -1223,16 +1081,8 @@ class RankGenesGroupsStackedViolin(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_stacked_violin.png"):
         self.function = sc.pl.rank_genes_groups_stacked_violin
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_stacked_violin(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsHeatmap(PlottingNode):
@@ -1254,16 +1104,8 @@ class RankGenesGroupsHeatmap(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_heatmap.png"):
         self.function = sc.pl.rank_genes_groups_heatmap
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_heatmap(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsDotPlot(PlottingNode):
@@ -1288,16 +1130,8 @@ class RankGenesGroupsDotPlot(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_dotplot.png"):
         self.function = sc.pl.rank_genes_groups_dotplot
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_dotplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsMatrixplot(PlottingNode):
@@ -1322,16 +1156,8 @@ class RankGenesGroupsMatrixplot(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
         self.function = sc.pl.rank_genes_groups_matrixplot
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_matrixplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
 
 
 class RankGenesGroupsTracksplot(PlottingNode):
@@ -1356,13 +1182,5 @@ class RankGenesGroupsTracksplot(PlottingNode):
                  save: Union[bool, str] = "rank_genes_groups_matrixplot.png"):
         self.function = sc.pl.rank_genes_groups_tracksplot
         super().__init__()
-        self.store_vars_as_parameters(**vars())
+        self.store_vars_as_parameters(**vars(), show=False)
         return
-
-    # def run(self):
-    #     ann_data = self._previous[0].result
-    #     sc._settings.ScanpyConfig.figdir = Path(os.path.dirname(self.parameters["save"]))
-    #     self.parameters["save"] = os.path.basename(self.parameters["save"])
-    #     pl.rank_genes_groups_tracksplot(ann_data, **self.parameters)
-    #     self._terminate(ann_data)
-    #     return
