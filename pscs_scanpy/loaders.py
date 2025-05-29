@@ -6,6 +6,8 @@ from pscs_api import InputNode
 
 class AnnDataLoadingNode(InputNode):
     important_parameters = []
+    __doc__ = """Loads an AnnData file (.h5ad) in the project into the pipeline; files are selected when the pipeline is 
+    selected from the Analysis tab."""
 
     def __init__(self,
                  path: str = None):

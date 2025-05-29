@@ -2,13 +2,16 @@ from scanpy import tools as tl
 from typing import Collection, Optional, Literal, Union, Sequence, Tuple, Mapping
 from pscs_api import PipelineNode
 from pscs_api.base import istr, InteractionList, Interaction
+import scanpy as sc
 
 class TSNE(PipelineNode):
     important_parameters = ["n_pcs", "perplexity"]
     requirements = InteractionList(obsm=[istr("use_rep")])
     effects = InteractionList(obsm=["X_tsne"],
                               uns=["tsne"])
-
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.tsne.html"
+    function = sc.tl.tsne
+    __doc__ = PipelineNode.set_doc(function, doc_url)
     def __init__(self,
                  n_pcs: Optional[int] = None,
                  use_rep: Optional[str] = None,
@@ -35,6 +38,9 @@ class UMAP(PipelineNode):
                     InteractionList(uns=[istr("neighbors_key")]))
     effects = InteractionList(obsm=["X_umap"],
                               uns=["umap"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.umap.html"
+    function = sc.tl.umap
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  min_dist: float = 0.5,
@@ -68,6 +74,9 @@ class DrawGraph(PipelineNode):
     effects = (InteractionList(Interaction(obsm=["X_draw_graph_" + istr("layout")]),
                               Interaction(obsm=["X_draw_graph_" + istr("key_added_ext")])) *
                 InteractionList(uns=["draw_graph"]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.draw_graph.html"
+    function = sc.tl.draw_graph
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  layout: Literal['fr', 'drl', 'kk', 'grid_fr', 'lgl', 'rt', 'rt_circular', 'fa'] = "fa",
@@ -95,6 +104,9 @@ class DiffMap(PipelineNode):
                                    Interaction(uns=[istr("neighbors_key")]))
     effects = InteractionList(obsm=["X_diffmap"],
                               uns=["diffmap_evals"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.diffmap.html"
+    function = sc.tl.diffmap
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_comps: int = 15,
@@ -117,6 +129,9 @@ class EmbeddingDensity(PipelineNode):
                                    obs=[istr("groupby")])
     effects = InteractionList(obs=[istr("key_added")],
                               uns=[istr("key_added")+"_params"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.embedding_density.html"
+    function = sc.tl.embedding_density
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  basis: str = "umap",
@@ -139,6 +154,9 @@ class Leiden(PipelineNode):
     requirements = InteractionList(Interaction(obsp=["connectivities"]),
                                    Interaction(obsp=[istr("obsp")]))
     effects = InteractionList(obs=[istr("key_added")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.leiden.html"
+    function = sc.tl.leiden
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  resolution: float = 1,
@@ -166,6 +184,9 @@ class Louvain(PipelineNode):
     requirements = InteractionList(Interaction(obsp=["connectivities"]),
                                    Interaction(obsp=[istr("obsp")]))
     effects = InteractionList(obs=[istr("key_added")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.louvain.html"
+    function = sc.tl.louvain
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  resolution: Optional[float] = None,
@@ -192,6 +213,9 @@ class Dendrogram(PipelineNode):
     requirements = InteractionList(obsm=[istr("use_rep")])
     effects = InteractionList(Interaction(uns=["dendrogram_"+istr("groupby")]),
                               Interaction(uns=[istr("key_added")]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.dendrogram.html"
+    function = sc.tl.dendrogram
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groupby: Collection[str],
@@ -219,6 +243,9 @@ class DPT(PipelineNode):
                                                obsp=["connectivities", "distances"]),
                                    Interaction(uns=[istr("neighbors_key")]))
     effects = InteractionList(obs=["dpt_pseudotime", "dpt_groups"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.dpt.html"
+    function = sc.tl.dpt
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_dcs: int = 10,
@@ -245,6 +272,9 @@ class PAGA(PipelineNode):
                                                 obsp=["connectivities", "distances"]),
                                     Interaction(uns=[istr("neighbors_key")])))
     effects = InteractionList(uns=["connectivities", "connectivities_tree"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.paga.html"
+    function = sc.tl.paga
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groups: Optional[str] = None,
@@ -271,6 +301,9 @@ class Ingest(PipelineNode):
                                     Interaction(uns=[istr("neighbors_key")])))
     effect = InteractionList(obs=[istr("obs")],
                              obsm=["X_"+istr("embedding_method")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.ingest.html"
+    function = sc.tl.ingest
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  obs: Union[str, Collection[str]] = ("umap", "pca"),
@@ -296,6 +329,9 @@ class RankGenesGroups(PipelineNode):
                                    layers=[istr("layer")])
     effects = InteractionList(Interaction(uns=["rank_genes_groups"]),
                               Interaction(uns=[istr("key_added")]))
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.rank_genes_groups.html"
+    function = sc.tl.rank_genes_groups
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  groupby: str,
@@ -325,6 +361,9 @@ class FilterRankGenesGroups(PipelineNode):
     important_parameters = ["groupby"]
     requirements = InteractionList(obs=[istr("key"), istr("groupby")])
     effects = InteractionList(obs=[istr("key_added")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.filter_rank_genes_groups.html"
+    function = sc.tl.filter_rank_genes_groups
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  key: str = None,
@@ -350,6 +389,9 @@ class ScoreGenes(PipelineNode):
     important_parameters = ["gene_list", "ctrl_size"]
     requirements = InteractionList(var_names=[istr("gene_list"), istr("gene_pool")])
     effects = InteractionList(obs=[istr("score_name")])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.score_genes.html"
+    function = sc.tl.score_genes
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  gene_list: Sequence[str],
@@ -374,6 +416,9 @@ class ScoreGenesCellCycle(PipelineNode):
     important_parameters = ["s_genes", "g2m_gnes"]
     requirements = InteractionList(var_names=[istr("s_genes"), istr("g2m_genes")])
     effects = InteractionList(obs=["S_score", "G2M_score", "phase"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.score_genes_cell_cycle.html"
+    function = sc.tl.score_genes_cell_cycle
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  s_genes: Sequence[str],
@@ -391,6 +436,9 @@ class ScoreGenesCellCycle(PipelineNode):
 
 class MarkerGeneOverlap(PipelineNode):
     important_parameters = ["reference_markers"]
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.marker_gene_overlap.html"
+    function = sc.tl.marker_gene_overlap
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  reference_markers: Union[Mapping[str, Collection], list],
@@ -416,6 +464,9 @@ class PCA(PipelineNode):
     effects = InteractionList(obsm=["X_pca"],
                               varm=["PCs"],
                               uns=["pca"])
+    doc_url = "https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.pca.html"
+    function = sc.tl.pca
+    __doc__ = PipelineNode.set_doc(function, doc_url)
 
     def __init__(self,
                  n_comps: Optional[int] = None,
